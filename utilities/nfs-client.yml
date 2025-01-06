@@ -1,0 +1,55 @@
+---
+kind: Deployment
+apiVersion: v1
+metadata:
+  name: nfs-client-provisioner
+  namespace: bakery-media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nfs-client-provisioner
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nfs-client-provisioner
+    spec:
+      serviceAccountName: nfs-client-provisioner
+      containers:
+        - name: nfs-client-provisioner
+          image: registry.k8s.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2
+          volumeMounts:
+            - name: nfs-client-media
+              mountPath: /persistentvolumes
+            - name: nfs-client-configs
+              mountPath: /persistentvolumes
+          env:
+            - name: PROVISIONER_NAME
+              value: k8s-sigs.io/nfs-subdir-external-provisioner
+            - name: NFS_SERVER
+              value: 10.0.0.199
+            - name: NFS_PATH
+              value: /run/nfs4
+            - name: ENABLE_LEADER_ELECTION
+              value: false
+      volumes:
+        - name: nfs-client-media
+          nfs:
+            server: 10.0.0.199
+            path: /run/nfs4/cooling-rack/plex
+        - name: nfs-client-configs
+          nfs:
+            server: 10.0.0.199
+            path: /run/nfs4/backup/bakery-configs
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-client
+provisioner: k8s-sigs.io/nfs-subdir-external-provisioner # or choose another name, must match deployment's env PROVISIONER_NAME'
+parameters:
+  pathPattern: "${.PVC.namespace}/${.PVC.annotations.nfs.io/storage-path}" # waits for nfs.io/storage-path annotation, if not specified will accept as empty string.
+  onDelete: delete
