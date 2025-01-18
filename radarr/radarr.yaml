@@ -25,7 +25,7 @@ spec:
             - name: PUID
               value: "1000"
             - name: PGID
-              value: "1000"
+              value: "1003"
           image: linuxserver/radarr:arm64v8-latest
           imagePullPolicy: IfNotPresent
           livenessProbe:

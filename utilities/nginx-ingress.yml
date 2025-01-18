@@ -31,3 +31,31 @@ spec:
             name: sonarr
             port:
               number: 8989
+      - path: /jackett
+        pathType: Prefix
+        backend:
+          service:
+            name: jackett
+            port:
+              number: 9117
+      - path: /transmission
+        pathType: Prefix
+        backend:
+          service:
+            name: transmission-ui
+            port:
+              number: 9091
+      - path: /transmission
+        pathType: Prefix
+        backend:
+          service:
+            name: transmission-peer
+            port:
+              number: 49153
+      - path: /sabnzbd
+        pathType: Prefix
+        backend:
+          service:
+            name: sabnzbd
+            port:
+              number: 9090

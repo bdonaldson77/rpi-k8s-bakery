@@ -2,23 +2,23 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: sonarr
+  name: transmission
   namespace: bakery-media
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
   selector:
     matchLabels:
-      app: sonarr
+      app: transmission
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: sonarr
+        app: transmission
     spec:
       containers:
-        - name: sonarr
+        - name: transmission
           env:
             - name: TZ
               value: PST
@@ -26,45 +26,47 @@ spec:
               value: "1000"
             - name: PGID
               value: "1003"
-          image: linuxserver/sonarr:arm64v8-latest
+            - name: DOCKER_MODS
+              value: "linuxserver/mods:transmission-transmissionic"
+          image: linuxserver/transmission:arm64v8-latest
           imagePullPolicy: IfNotPresent
           livenessProbe:
             tcpSocket:
-              port: 8989
+              port: 9091
             initialDelaySeconds: 60
           readinessProbe:
             failureThreshold: 6
             periodSeconds: 10
             successThreshold: 1
             tcpSocket:
-              port: 8989
+              port: 9091
             timeoutSeconds: 1
           startupProbe:
             failureThreshold: 3
             periodSeconds: 30
             successThreshold: 1
             tcpSocket:
-              port: 8989
+              port: 9091
             timeoutSeconds: 1
           ports:
-            - containerPort: 8989
+            - containerPort: 9091
               name: http
               protocol: TCP
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
-            - name: sonarr-plexmedia
-              mountPath: /mnt/media
-            - name: sonarr-configs
-              subPath: k8s-sonarr/config/
+            - name: transmission-plexmedia
+              mountPath: /downloads
+            - name: transmission-configs
+              subPath: k8s-transmission/config/
               mountPath: /config
       volumes:
-        - name: sonarr-plexmedia
+        - name: transmission-plexmedia
           nfs:
             server: 10.0.0.199
-            path: /run/nfs4/cooling-rack/plex
-        - name: sonarr-configs
+            path: /run/nfs4/cooling-rack/plex/torrents/
+        - name: transmission-configs
           nfs:
             server: 10.0.0.199
             path: /run/nfs4/backup/bakery-configs
@@ -75,12 +77,27 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: sonarr
+  name: transmission-peer
   namespace: bakery-media
 spec:
   type: NodePort
   ports:
-    - port: 8989
-      targetPort: 8989
+    - port: 49153
+      targetPort: 49153
+      protocol: UDP
   selector:
-    app: sonarr
+    app: transmission
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transmission-ui
+  namespace: bakery-media
+spec:
+  type: NodePort
+  ports:
+    - port: 9091
+      targetPort: 9091
+  selector:
+    app: transmission
