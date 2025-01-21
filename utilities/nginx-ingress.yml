@@ -59,7 +59,7 @@ spec:
             name: sabnzbd
             port:
               number: 9090
-  - host: overseerr.media.bakery
+  - host: requests.devoptimus.co
     http:
       paths:
       - path: /
