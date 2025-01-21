@@ -59,3 +59,23 @@ spec:
             name: sabnzbd
             port:
               number: 9090
+  - host: requests.devoptimus.co
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: overseerr
+            port:
+              number: 5055
+  - host: requests.media.bakery
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: overseerr
+            port:
+              number: 5055
