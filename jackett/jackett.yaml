@@ -27,7 +27,7 @@ spec:
             - name: PGID
               value: "1003"
           image: linuxserver/jackett:arm64v8-latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           livenessProbe:
             tcpSocket:
               port: 9117

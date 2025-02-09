@@ -29,7 +29,7 @@ spec:
             - name: DOCKER_MODS
               value: "linuxserver/mods:transmission-transmissionic"
           image: linuxserver/transmission:arm64v8-latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           livenessProbe:
             tcpSocket:
               port: 9091

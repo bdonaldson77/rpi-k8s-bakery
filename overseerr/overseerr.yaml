@@ -23,7 +23,7 @@ spec:
             - name: TZ
               value: America/Vancouver
           image: sctx/overseerr
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           livenessProbe:
             tcpSocket:
               port: 5055
